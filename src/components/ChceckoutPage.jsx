@@ -26,7 +26,7 @@ const CheckoutPage = () => {
     region: '',
     country: '',
     shippingMethod: 'Standard Delivery',
-    paymentMethod: 'JazzCash/Bank Transfer',
+    paymentMethod: 'Bank Transfer',
     promoCode: '',
     notes: '',
   });
@@ -70,8 +70,20 @@ const CheckoutPage = () => {
   }, []);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
-  const total = subtotal + shippingCost;
+  
+  // Calculate delivery charges based on payment method
+  const shippingCost = form.paymentMethod === 'Cash on Delivery' ? 300 : 0;
+  
+  // Calculate tax (4% for COD only)
+  const taxRate = form.paymentMethod === 'Cash on Delivery' ? 0.04 : 0;
+  const taxAmount = (subtotal + shippingCost) * taxRate;
+  
+  // Calculate discount (10% if subtotal > 3500)
+  const discountRate = subtotal > 3500 ? 0.1 : 0;
+  const discountAmount = subtotal * discountRate;
+  
+  // Calculate final total
+  const total = subtotal + shippingCost + taxAmount - discountAmount;
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -82,8 +94,8 @@ const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-    // Clear the Base64 string if payment method changes from JazzCash/Bank Transfer
-    if (name === 'paymentMethod' && value !== 'JazzCash/Bank Transfer') {
+    // Clear the Base64 string if payment method changes from Bank Transfer
+    if (name === 'paymentMethod' && value !== 'Bank Transfer') {
       setBankTransferProofBase64(null);
     }
   };
@@ -125,7 +137,7 @@ const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
       newErrors.email = 'Please enter a valid email address';
     }
 
-    if (form.paymentMethod === 'JazzCash/Bank Transfer' && !bankTransferProofBase64) {
+    if (form.paymentMethod === 'Bank Transfer' && !bankTransferProofBase64) {
       newErrors.bankTransferProof = 'Please upload a screenshot of your JazzCash transfer or bank transfer receipt.';
     }
 
@@ -179,10 +191,12 @@ const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
       notes: form.notes,
       subtotal,
       shippingCost,
+      taxAmount,
+      discountAmount,
       total,
       createdAt: new Date(),
       status: 'processing',
-      bankTransferProofBase64: form.paymentMethod === 'JazzCash/Bank Transfer' ? bankTransferProofBase64 : null,
+      bankTransferProofBase64: form.paymentMethod === 'Bank Transfer' ? bankTransferProofBase64 : null,
     };
 
     try {
@@ -374,7 +388,7 @@ const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
                   <div className="ml-3">
                     <p className="font-medium text-gray-900">Standard Delivery</p>
                     <p className="text-sm text-gray-500">
-                      PKR 200 for lahore and 350 for other cities - Delivery in 8-10 business days
+                      Delivery in 8-10 business days
                     </p>
                   </div>
                 </label>
@@ -383,7 +397,7 @@ const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
               <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
 
               <div className="space-y-4">
-                {['JazzCash/Bank Transfer'].map(method => (
+                {['Bank Transfer', 'Cash on Delivery'].map(method => (
                   <label key={method} className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
                     <input
                       type="radio"
@@ -393,14 +407,27 @@ const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
                       onChange={handleChange}
                       className="h-4 w-4 text-black focus:ring-black border-gray-300"
                     />
-                    <span className="ml-3 font-medium text-gray-900">{method}</span>
+                    <div className="ml-3">
+                      <span className="font-medium text-gray-900">{method}</span>
+                      {method === 'Cash on Delivery' && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          <p>• Delivery charges: PKR 300</p>
+                          <p>• Government tax: 4% (as per Pakistan government policy)</p>
+                        </div>
+                      )}
+                      {method === 'Bank Transfer' && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          <p>• No delivery charges</p>
+                        </div>
+                      )}
+                    </div>
                   </label>
                 ))}
               </div>
 
-              {form.paymentMethod === 'JazzCash/Bank Transfer' && (
+              {form.paymentMethod === 'Bank Transfer' && (
                 <div className="mt-6 p-4 border border-blue-300 bg-blue-50 rounded-md">
-                  <h3 className="text-base sm:text-lg font-semibold mb-3">JazzCash/Bank Transfer Details</h3>
+                  <h3 className="text-base sm:text-lg font-semibold mb-3">Bank Transfer Details</h3>
                   <p className="text-gray-700 text-sm sm:text-base mb-4">
                     Please transfer the total amount of PKR {total.toLocaleString()} to our account:
                   </p>
@@ -523,14 +550,30 @@ const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
                   <span className="text-sm">PKR {subtotal.toLocaleString()}</span>
                 </div>
 
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Shipping</span>
-                  <span className="text-sm">PKR {shippingCost.toLocaleString()}</span>
-                </div>
+                {shippingCost > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Delivery Charges</span>
+                    <span className="text-sm">PKR {shippingCost.toLocaleString()}</span>
+                  </div>
+                )}
+
+                {taxAmount > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Government Tax (4%)</span>
+                    <span className="text-sm">PKR {Math.round(taxAmount).toLocaleString()}</span>
+                  </div>
+                )}
+
+                {discountAmount > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Discount (10%)</span>
+                    <span className="text-sm text-green-600">-PKR {Math.round(discountAmount).toLocaleString()}</span>
+                  </div>
+                )}
 
                 {form.promoCode && (
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Discount</span>
+                    <span className="text-sm text-gray-600">Promo Discount</span>
                     <span className="text-sm text-green-600">-PKR 0</span>
                   </div>
                 )}
@@ -538,8 +581,22 @@ const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
 
               <div className="flex justify-between mt-4 pt-4 border-t border-gray-200">
                 <span className="font-medium text-base sm:text-lg">Total</span>
-                <span className="font-bold text-base sm:text-lg">PKR {total.toLocaleString()}</span>
+                <span className="font-bold text-base sm:text-lg">PKR {Math.round(total).toLocaleString()}</span>
               </div>
+
+              {/* Show discount notification */}
+              {subtotal > 3500 && (
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-sm text-green-700 font-medium">🎉 You saved PKR {Math.round(discountAmount).toLocaleString()} with 10% discount!</p>
+                </div>
+              )}
+
+              {/* Show discount progress */}
+              {subtotal <= 3500 && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-sm text-blue-700">Add PKR {(3500 - subtotal + 1).toLocaleString()} more to get 10% discount!</p>
+                </div>
+              )}
 
               <button
                 onClick={placeOrder}
@@ -563,7 +620,6 @@ const shippingCost = form.city.trim().toLowerCase() === 'lahore' ? 200 : 350;
 
               <div className="mt-6 text-center text-xs sm:text-sm text-gray-500">
                 <p>100% secure checkout</p>
-
               </div>
             </div>
           </div>
