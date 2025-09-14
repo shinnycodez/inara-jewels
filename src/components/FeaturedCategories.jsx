@@ -20,6 +20,12 @@ const categories = [
     imageUrl:"https://pbs.twimg.com/media/G0zLK9zbwAEcTsf?format=jpg&name=4096x4096",
      link: "Rings"
   },
+        {
+      id: 7,
+    title: "Necklaces⋆⭒˚.⋆",
+    imageUrl:"https://pbs.twimg.com/media/G0z-TXYbsAE-4oy?format=jpg&name=medium",
+     link: "Necklaces"
+  },
 
   //   {
   //   id: 4,

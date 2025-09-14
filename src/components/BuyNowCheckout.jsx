@@ -442,12 +442,11 @@ const BuyNowCheckout = () => {
                     Please transfer the total amount of PKR {Math.round(total).toLocaleString()} to our account:
                   </p>
                   <ul className="list-disc list-inside text-gray-800 text-sm sm:text-base mb-4">
-                     <li><strong>Account Name:</strong> Haba Amin </li>
-                    <li><strong>JazzCash Number:</strong> 03234016813</li>
-                    <li><strong>Bank Account Details:</strong> </li>
-                    <li><strong>Bank name</strong> Meezan Bank</li>
-                    <li><strong>Account name</strong> AYESHA AMIN</li>
-                    <li><strong>Account number</strong> 02360112042678</li>
+                  <li><strong>Bank Account Details:</strong> </li>
+                    <li><strong>Bank name</strong> Meezan Bank- BANK RD BR RAWALPIND</li>
+                    <li><strong>Account name</strong> EESHA IMRAN</li>
+                    <li><strong>Account number</strong> 08010108040544</li>
+                    <li><strong>IBAN</strong> PK41MEZN0008010108040544</li>
                   </ul>
                   
                   <p className="text-gray-700 mb-4 text-sm sm:text-base">
