@@ -50,7 +50,7 @@ function SidebarFilters({ onFilterChange, onClose }) {
 
   return (
     <div className="flex flex-col w-full md:w-80">
-      <h2 className="text-[#141414] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
+      <h2 className="text-[#760AB0] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
         Filters
       </h2>
       <div className="flex flex-col p-4 gap-3">
@@ -61,8 +61,8 @@ function SidebarFilters({ onFilterChange, onClose }) {
 #fefaf9] px-[15px] py-[7px] group"
           >
             <summary className="flex cursor-pointer items-center justify-between gap-6 py-2">
-              <p className="text-[#141414] text-sm font-medium leading-normal">{filter}</p>
-              <div className="text-[#141414] group-open:rotate-180">
+              <p className="text-[#760AB0] text-sm font-medium leading-normal">{filter}</p>
+              <div className="text-[#760AB0] group-open:rotate-180">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
                   <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
                 </svg>
@@ -99,8 +99,8 @@ function SidebarFilters({ onFilterChange, onClose }) {
 #fefaf9] px-[15px] py-[7px] group"
         >
           <summary className="flex cursor-pointer items-center justify-between gap-6 py-2">
-            <p className="text-[#141414] text-sm font-medium leading-normal">Price Range</p>
-            <div className="text-[#141414] group-open:rotate-180">
+            <p className="text-[#760AB0] text-sm font-medium leading-normal">Price Range</p>
+            <div className="text-[#760AB0] group-open:rotate-180">
               <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
                 <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
               </svg>
@@ -133,13 +133,13 @@ function SidebarFilters({ onFilterChange, onClose }) {
         <div className="flex gap-2 mt-2">
           <button
             onClick={applyFilters}
-            className="flex-1 bg-[#141414] text-white text-sm font-semibold py-2 px-4 rounded hover:opacity-90 transition"
+            className="flex-1 bg-[#FFCCE1] text-white text-sm font-semibold py-2 px-4 rounded hover:opacity-90 transition"
           >
             Apply Filters
           </button>
           <button
             onClick={clearFilters}
-            className="flex-1 border border-[#141414] text-[#141414] text-sm font-semibold py-2 px-4 rounded hover:bg-[#f3f3f3] transition"
+            className="flex-1 border border-[#141414] text-[#760AB0] text-sm font-semibold py-2 px-4 rounded hover:bg-[#f3f3f3] transition"
           >
             Clear
           </button>

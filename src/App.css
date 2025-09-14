@@ -48,5 +48,10 @@
 .animate-fade-in-out {
   animation: fade-in-out 2.5s ease-in-out;
 }
+h1 {
+  font-family: 'Forum', serif;
+  /* OR */
+  font-family: 'Lobster Two', cursive;
+}
 
 @import "tailwindcss";

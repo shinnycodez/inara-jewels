@@ -220,7 +220,7 @@ const ProductPage = ({ onOpenCart }) => {
   const savings = product.price - discountedPrice;
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-[#FFF5EE] overflow-x-hidden">
+    <div className="relative flex min-h-screen flex-col bg-[#FFFFFF] overflow-x-hidden">
       {showSuccess && (
         <div className="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100]">
           <div className="flex items-center gap-3 bg-green-100 border border-green-300 text-green-800 px-5 py-2 rounded-xl shadow-lg animate-fade-in-out transition-all">
@@ -239,7 +239,7 @@ const ProductPage = ({ onOpenCart }) => {
       )}
 
       <Header />
-      <div className="layout-container flex h-full grow flex-col bg-[#FFF5EE]">
+      <div className="layout-container flex h-full grow flex-col bg-[#FFFFFF]">
         <div className="gap-1 px-6 flex flex-1 justify-center py-5 flex-col md:flex-row">
           <div className="flex flex-col max-w-[920px] flex-1">
             <div className="flex w-full grow p-4 relative">
@@ -263,7 +263,7 @@ const ProductPage = ({ onOpenCart }) => {
           <div className="flex flex-col w-full md:w-[360px]">
             {/* Product Info with Discount Pricing */}
             <div className="px-4 py-3">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.title}</h1>
+              <h1 className="text-2xl font-bold text-[#760AB0] mb-2">{product.title}</h1>
               
               {/* Price Display with Discount */}
               <div className="mb-4">
@@ -273,7 +273,7 @@ const ProductPage = ({ onOpenCart }) => {
                       <span className="text-2xl font-bold text-green-600">
                         PKR {discountedPrice.toLocaleString()}
                       </span>
-                      <span className="text-lg text-gray-500 line-through">
+                      <span className="text-lg text-[#760AB0] line-through">
                         PKR {product.price.toLocaleString()}
                       </span>
                     </div>
@@ -292,7 +292,7 @@ const ProductPage = ({ onOpenCart }) => {
                     )}
                   </div>
                 ) : (
-                  <span className="text-2xl font-bold text-gray-900">
+                  <span className="text-2xl font-bold text-[#760AB0]">
                     PKR {product.price.toLocaleString()}
                   </span>
                 )}
