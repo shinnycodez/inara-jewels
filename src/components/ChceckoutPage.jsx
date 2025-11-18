@@ -72,11 +72,10 @@ const CheckoutPage = () => {
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   
   // Calculate delivery charges based on payment method
-  const shippingCost = form.paymentMethod === 'Cash on Delivery' ? 300 : 0;
+  const shippingCost = form.paymentMethod === 'Cash on Delivery' ? 280 : 0;
   
-  // Calculate tax (4% for COD only)
-  const taxRate = form.paymentMethod === 'Cash on Delivery' ? 0.04 : 0;
-  const taxAmount = (subtotal + shippingCost) * taxRate;
+  // Remove tax calculation
+  const taxAmount = 0;
   
   // Calculate discount (10% if subtotal > 3500)
   const discountRate = subtotal > 3500 ? 0.1 : 0;
@@ -94,33 +93,6 @@ const CheckoutPage = () => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-    // Clear the Base64 string if payment method changes from Bank Transfer
-    if (name === 'paymentMethod' && value !== 'Bank Transfer') {
-      setBankTransferProofBase64(null);
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setConvertingImage(true);
-      setErrors(prev => ({ ...prev, bankTransferProof: '' }));
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setBankTransferProofBase64(reader.result);
-        setConvertingImage(false);
-      };
-      reader.onerror = (error) => {
-        console.error("Error converting file to Base64:", error);
-        setBankTransferProofBase64(null);
-        setConvertingImage(false);
-        setErrors(prev => ({ ...prev, bankTransferProof: 'Failed to read image file.' }));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setBankTransferProofBase64(null);
-    }
   };
 
   const validateForm = () => {
@@ -135,10 +107,6 @@ const CheckoutPage = () => {
     // Email validation
     if (form.email && !/\S+@\S+\.\S+/.test(form.email)) {
       newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (form.paymentMethod === 'Bank Transfer' && !bankTransferProofBase64) {
-      newErrors.bankTransferProof = 'Please upload a screenshot of your JazzCash transfer or bank transfer receipt.';
     }
 
     setErrors(newErrors);
@@ -196,7 +164,6 @@ const CheckoutPage = () => {
       total,
       createdAt: new Date(),
       status: 'processing',
-      bankTransferProofBase64: form.paymentMethod === 'Bank Transfer' ? bankTransferProofBase64 : null,
     };
 
     try {
@@ -212,11 +179,7 @@ const CheckoutPage = () => {
       navigate('/thanks');
     } catch (err) {
       console.error("Error placing order:", err);
-      if (err.code === 'resource-exhausted' || err.message.includes('too large')) {
-        alert('Error: The uploaded image is too large. Please try a smaller image or contact support.');
-      } else {
-        alert('Error placing order. Please try again.');
-      }
+      alert('Error placing order. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -411,8 +374,7 @@ const CheckoutPage = () => {
                       <span className="font-medium text-gray-900">{method}</span>
                       {method === 'Cash on Delivery' && (
                         <div className="text-xs text-gray-500 mt-1">
-                          <p>• Delivery charges: PKR 300</p>
-                          <p>• Government tax: 4% (as per Pakistan government policy)</p>
+                          <p>• Delivery charges: PKR 280</p>
                         </div>
                       )}
                       {method === 'Bank Transfer' && (
@@ -427,7 +389,7 @@ const CheckoutPage = () => {
 
               {form.paymentMethod === 'Bank Transfer' && (
                 <div className="mt-6 p-4 border border-blue-300 bg-blue-50 rounded-md">
-                  <h3 className="text-base sm:text-lg font-semibold mb-3">Bank Transfer Details</h3>
+                  <h3 className="text-base sm:text-lg font-semibold mb-3">Bank Transfer Instructions</h3>
                   <p className="text-gray-700 text-sm sm:text-base mb-4">
                     Please transfer the total amount of PKR {total.toLocaleString()} to our account:
                   </p>
@@ -438,32 +400,13 @@ const CheckoutPage = () => {
                     <li><strong>Account number</strong> 08010108040544</li>
                     <li><strong>IBAN</strong>PK41MEZN0008010108040544</li>
                   </ul>
-                  <p className="text-gray-700 text-sm sm:text-base mb-4">
-                    After making the transfer, please upload a screenshot of the transaction or bank transfer receipt as proof of payment.
+                  <p className="text-gray-700 text-sm sm:text-base mb-4 font-semibold">
+                    After making the transfer, please DM your full name along with the screenshot of payment on our Instagram page to confirm your order.
                   </p>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Upload Transfer Screenshot/Receipt*
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className={`w-full px-4 py-2 border ${errors.bankTransferProof ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
-                    />
-                    {errors.bankTransferProof && <p className="mt-1 text-sm text-red-600">{errors.bankTransferProof}</p>}
-                    {bankTransferProofBase64 && (
-                      <p className="mt-2 text-sm text-gray-600">Image selected and converted.</p>
-                    )}
-                    {convertingImage && (
-                      <p className="mt-2 text-sm text-gray-600 flex items-center">
-                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Converting image...
-                      </p>
-                    )}
+                  <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Important:</strong> Don't forget to send the payment screenshot via Instagram DM with your full name for order confirmation.
+                    </p>
                   </div>
                 </div>
               )}
@@ -556,13 +499,6 @@ const CheckoutPage = () => {
                   </div>
                 )}
 
-                {taxAmount > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Government Tax (4%)</span>
-                    <span className="text-sm">PKR {Math.round(taxAmount).toLocaleString()}</span>
-                  </div>
-                )}
-
                 {discountAmount > 0 && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Discount (10%)</span>
@@ -599,16 +535,16 @@ const CheckoutPage = () => {
 
               <button
                 onClick={placeOrder}
-                disabled={loading || cartItems.length === 0 || convertingImage}
-                className={`mt-6 w-full py-3 px-4 rounded-md font-medium text-base ${loading || cartItems.length === 0 || convertingImage ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'} transition`}
+                disabled={loading || cartItems.length === 0}
+                className={`mt-6 w-full py-3 px-4 rounded-md font-medium text-base ${loading || cartItems.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'} transition`}
               >
-                {loading || convertingImage ? (
+                {loading ? (
                   <span className="flex items-center justify-center">
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {convertingImage ? 'Converting Image...' : 'Processing Order...'}
+                    Processing Order...
                   </span>
                 ) : cartItems.length === 0 ? (
                   'Your Cart is Empty'
